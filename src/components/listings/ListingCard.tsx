@@ -21,9 +21,9 @@ interface ListingCardProps {
 
 const ListingCard = ({ listing }: ListingCardProps) => {
   return (
-    <div className="group overflow-hidden rounded-xl bg-card border border-border shadow-card card-hover">
+    <div className="group overflow-hidden rounded-xl bg-card border border-border shadow-card card-hover h-full flex flex-col">
       {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted flex-shrink-0">
         <img
           src={listing.image}
           alt={listing.title}
@@ -47,18 +47,18 @@ const ListingCard = ({ listing }: ListingCardProps) => {
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-grow">
         <div className="mb-2">
           <Badge variant="secondary" className="text-xs">
             {listing.category}
           </Badge>
         </div>
 
-        <h3 className="mb-2 line-clamp-2 text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+        <h3 className="mb-2 line-clamp-2 text-lg font-semibold text-foreground group-hover:text-primary transition-colors min-h-[3.5rem]">
           <Link to={`/listing/${listing.id}`}>{listing.title}</Link>
         </h3>
 
-        <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
+        <p className="mb-4 line-clamp-2 text-sm text-muted-foreground min-h-[2.5rem]">
           {listing.description}
         </p>
 
@@ -74,13 +74,15 @@ const ListingCard = ({ listing }: ListingCardProps) => {
           </div>
         </div>
 
-        {/* Action */}
-        <Link to={`/listing/${listing.id}`}>
-          <Button variant="outline" className="w-full gap-2">
-            <MessageSquare className="h-4 w-4" />
-            Sazināties
-          </Button>
-        </Link>
+        {/* Action - pushed to bottom */}
+        <div className="mt-auto">
+          <Link to={`/listing/${listing.id}`}>
+            <Button variant="outline" className="w-full gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Sazināties
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );
