@@ -69,7 +69,7 @@ const mockConversations: Conversation[] = [
 ];
 
 const Messages = () => {
-  const [conversations] = useState<Conversation[]>(mockConversations);
+  const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,7 +82,38 @@ const Messages = () => {
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedConversation) return;
-    // In real app, this would send the message
+    
+    const now = new Date();
+    const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    const newMsg: Message = {
+      id: Date.now().toString(),
+      text: newMessage.trim(),
+      timestamp,
+      isOwn: true,
+    };
+
+    // Update the selected conversation with the new message
+    const updatedConversations = conversations.map((conv) => {
+      if (conv.id === selectedConversation.id) {
+        return {
+          ...conv,
+          messages: [...conv.messages, newMsg],
+          lastMessage: newMessage.trim(),
+          timestamp: "Tikko",
+        };
+      }
+      return conv;
+    });
+
+    setConversations(updatedConversations);
+    
+    // Update selected conversation to show new message
+    const updatedSelected = updatedConversations.find(c => c.id === selectedConversation.id);
+    if (updatedSelected) {
+      setSelectedConversation(updatedSelected);
+    }
+    
     setNewMessage("");
   };
 
