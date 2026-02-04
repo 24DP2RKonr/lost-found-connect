@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { listingsStore, useListings } from "@/stores/listingsStore";
+import { messagesStore } from "@/stores/messagesStore";
 import { Listing } from "@/components/listings/ListingCard";
 
 const ListingDetail = () => {
@@ -56,11 +57,18 @@ const ListingDetail = () => {
   };
 
   const handleSendMessage = () => {
-    if (!message.trim()) {
+    if (!message.trim() || !listing || !id) {
       toast.error("Lūdzu uzraksti ziņojumu");
       return;
     }
-    toast.success("Ziņojums nosūtīts!");
+    
+    messagesStore.startConversation({
+      listingId: id,
+      listingTitle: listing.title,
+      messageText: message.trim(),
+    });
+    
+    toast.success("Ziņojums nosūtīts! Atver 'Ziņojumi' lai redzētu sarunu.");
     setMessage("");
   };
 

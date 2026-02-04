@@ -1,80 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Send, ArrowLeft } from "lucide-react";
-
-interface Message {
-  id: string;
-  text: string;
-  timestamp: string;
-  isOwn: boolean;
-}
-
-interface Conversation {
-  id: string;
-  userName: string;
-  userAvatar?: string;
-  lastMessage: string;
-  timestamp: string;
-  unread: number;
-  listingTitle: string;
-  messages: Message[];
-}
-
-const mockConversations: Conversation[] = [
-  {
-    id: "1",
-    userName: "Jānis Bērziņš",
-    lastMessage: "Vai telefons vēl ir pieejams?",
-    timestamp: "Pirms 5 min",
-    unread: 2,
-    listingTitle: "Melns iPhone 15 Pro",
-    messages: [
-      { id: "1", text: "Sveiki! Es redzēju jūsu sludinājumu par pazudušo telefonu.", timestamp: "14:30", isOwn: false },
-      { id: "2", text: "Vai tas ir ar sarkanu maciņu?", timestamp: "14:31", isOwn: false },
-      { id: "3", text: "Jā, tieši tā! Vai jūs to esat atraduši?", timestamp: "14:35", isOwn: true },
-      { id: "4", text: "Vai telefons vēl ir pieejams?", timestamp: "14:40", isOwn: false },
-    ],
-  },
-  {
-    id: "2",
-    userName: "Anna Liepiņa",
-    lastMessage: "Paldies, tikāmies rīt!",
-    timestamp: "Pirms 1h",
-    unread: 0,
-    listingTitle: "Atrasts maks ar dokumentiem",
-    messages: [
-      { id: "1", text: "Labdien! Tas varētu būt mans maks.", timestamp: "12:00", isOwn: false },
-      { id: "2", text: "Vai jūs varat aprakstīt, kas tajā ir?", timestamp: "12:05", isOwn: true },
-      { id: "3", text: "Jā, tur ir ID karte un 2 bankas kartes.", timestamp: "12:10", isOwn: false },
-      { id: "4", text: "Paldies, tikāmies rīt!", timestamp: "12:15", isOwn: false },
-    ],
-  },
-  {
-    id: "3",
-    userName: "Pēteris Kalniņš",
-    lastMessage: "Es nosūtīšu foto",
-    timestamp: "Vakar",
-    unread: 1,
-    listingTitle: "Pazudis kaķis Mincis",
-    messages: [
-      { id: "1", text: "Sveiki, es redzēju pelēku kaķi pie mūsu mājas!", timestamp: "Vakar 18:00", isOwn: false },
-      { id: "2", text: "Tiešām? Kur tieši?", timestamp: "Vakar 18:05", isOwn: true },
-      { id: "3", text: "Es nosūtīšu foto", timestamp: "Vakar 18:10", isOwn: false },
-    ],
-  },
-];
+import { useConversations, messagesStore, Conversation } from "@/stores/messagesStore";
 
 const Messages = () => {
-  const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
+  const allConversations = useConversations();
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const filteredConversations = conversations.filter(
+  // Update selected conversation when store changes
+  useEffect(() => {
+    if (selectedConversation) {
+      const updated = allConversations.find((c) => c.id === selectedConversation.id);
+      if (updated) {
+        setSelectedConversation(updated);
+      }
+    }
+  }, [allConversations, selectedConversation?.id]);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [selectedConversation?.messages]);
+
+  const filteredConversations = allConversations.filter(
     (conv) =>
       conv.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       conv.listingTitle.toLowerCase().includes(searchQuery.toLowerCase())
@@ -83,37 +38,7 @@ const Messages = () => {
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedConversation) return;
     
-    const now = new Date();
-    const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
-    const newMsg: Message = {
-      id: Date.now().toString(),
-      text: newMessage.trim(),
-      timestamp,
-      isOwn: true,
-    };
-
-    // Update the selected conversation with the new message
-    const updatedConversations = conversations.map((conv) => {
-      if (conv.id === selectedConversation.id) {
-        return {
-          ...conv,
-          messages: [...conv.messages, newMsg],
-          lastMessage: newMessage.trim(),
-          timestamp: "Tikko",
-        };
-      }
-      return conv;
-    });
-
-    setConversations(updatedConversations);
-    
-    // Update selected conversation to show new message
-    const updatedSelected = updatedConversations.find(c => c.id === selectedConversation.id);
-    if (updatedSelected) {
-      setSelectedConversation(updatedSelected);
-    }
-    
+    messagesStore.addMessage(selectedConversation.id, newMessage.trim());
     setNewMessage("");
   };
 
@@ -251,6 +176,7 @@ const Messages = () => {
                         </div>
                       </div>
                     ))}
+                    <div ref={messagesEndRef} />
                   </div>
 
                   {/* Message Input */}
