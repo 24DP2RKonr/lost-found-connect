@@ -134,6 +134,10 @@ let listeners: (() => void)[] = [];
 export const listingsStore = {
   getListings: (): Listing[] => listings,
 
+  getListing: (id: string): Listing | undefined => {
+    return listings.find((l) => l.id === id);
+  },
+
   addListing: (data: {
     title: string;
     description: string;
@@ -159,6 +163,20 @@ export const listingsStore = {
     saveListings(listings);
     notifyListeners();
     return newListing;
+  },
+
+  deleteListing: (id: string): void => {
+    listings = listings.filter((l) => l.id !== id);
+    saveListings(listings);
+    notifyListeners();
+  },
+
+  incrementViews: (id: string): void => {
+    listings = listings.map((l) =>
+      l.id === id ? { ...l, views: l.views + 1 } : l
+    );
+    saveListings(listings);
+    notifyListeners();
   },
 
   subscribe: (listener: () => void): (() => void) => {
