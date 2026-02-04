@@ -15,6 +15,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, MapPin, Upload, Calendar, Tag, FileText, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { listingsStore } from "@/stores/listingsStore";
 
 const CreateListing = () => {
   const [searchParams] = useSearchParams();
@@ -41,7 +42,17 @@ const CreateListing = () => {
       return;
     }
 
-    // Mock submission
+    // Add listing to store
+    listingsStore.addListing({
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      location: formData.location,
+      date: formData.date,
+      type: listingType,
+      images: images,
+    });
+
     toast.success("Sludinājums veiksmīgi publicēts!");
     navigate("/listings");
   };
