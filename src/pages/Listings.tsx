@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
-import ListingCard, { Listing } from "@/components/listings/ListingCard";
+import ListingCard from "@/components/listings/ListingCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -11,101 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter, MapPin, Grid, List } from "lucide-react";
-
-// Mock data
-const allListings: Listing[] = [
-  {
-    id: "1",
-    title: "Melns iPhone 15 Pro ar sarkanu maciņu",
-    description: "Pazaudēju telefonu Vecrīgā, pie Doma laukuma. Ekrānam ir neliela skramba stūrī.",
-    type: "lost",
-    category: "Elektronika",
-    location: "Rīga, Vecrīga",
-    date: "2024-01-28",
-    image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80",
-    views: 245,
-  },
-  {
-    id: "2",
-    title: "Atrasts maks ar dokumentiem",
-    description: "Atradu brūnu ādas maku ar personas dokumentiem un bankas kartēm. Atrasts pie Origo.",
-    type: "found",
-    category: "Maks / Somas",
-    location: "Rīga, Centrs",
-    date: "2024-01-28",
-    image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=400&q=80",
-    views: 189,
-  },
-  {
-    id: "3",
-    title: "Pazudis kaķis Mincis",
-    description: "Pelēks kaķis ar baltām ķepiņām. Pazuda Āgenskalnā. Ļoti pietrūkst mūsu ģimenei.",
-    type: "lost",
-    category: "Mājdzīvnieki",
-    location: "Rīga, Āgenskalns",
-    date: "2024-01-27",
-    image: "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&q=80",
-    views: 567,
-  },
-  {
-    id: "4",
-    title: "Atrastas automašīnas atslēgas",
-    description: "VW atslēgas ar melnu piekariņu. Atrastas pie Stockmann veikala ieejas.",
-    type: "found",
-    category: "Atslēgas",
-    location: "Rīga, Centrs",
-    date: "2024-01-27",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
-    views: 98,
-  },
-  {
-    id: "5",
-    title: "Pazaudētas airpods austiņas",
-    description: "Baltas Apple AirPods Pro ar melnu maciņu. Pazaudētas Alfa centrā, pie kafejnīcas.",
-    type: "lost",
-    category: "Elektronika",
-    location: "Rīga, Alfa",
-    date: "2024-01-26",
-    image: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400&q=80",
-    views: 156,
-  },
-  {
-    id: "6",
-    title: "Atrasta sudraba aproce",
-    description: "Skaista sudraba aproce ar sirdspuķēm. Atrasta Bastejkalnā pie soliņa.",
-    type: "found",
-    category: "Rotaslietas",
-    location: "Rīga, Bastejkalns",
-    date: "2024-01-26",
-    image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80",
-    views: 234,
-  },
-  {
-    id: "7",
-    title: "Pazaudēts suns - Reksis",
-    description: "Labradoru retrīvers, dzeltens. Pazudis Mežaparkā pastaigājoties. Draudzīgs un mīlošs.",
-    type: "lost",
-    category: "Mājdzīvnieki",
-    location: "Rīga, Mežaparks",
-    date: "2024-01-25",
-    image: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80",
-    views: 892,
-  },
-  {
-    id: "8",
-    title: "Atrasts bērnu mugursoma",
-    description: "Zila mugursoma ar Spiderman zīmējumu. Atrasta pie Ķengaraga skolas.",
-    type: "found",
-    category: "Cits",
-    location: "Rīga, Ķengarags",
-    date: "2024-01-25",
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80",
-    views: 67,
-  },
-];
+import { Search, Grid, List } from "lucide-react";
+import { useListings } from "@/stores/listingsStore";
 
 const Listings = () => {
+  const allListings = useListings();
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
