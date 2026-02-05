@@ -1,9 +1,22 @@
+import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
 import {
   User,
   MapPin,
@@ -13,12 +26,17 @@ import {
   MessageSquare,
   Settings,
   Edit,
+  Bell,
+  Shield,
+  Eye,
 } from "lucide-react";
 import ListingCard, { Listing } from "@/components/listings/ListingCard";
 
 // Mock user data
-const userData = {
+const initialUserData = {
   name: "Jānis Bērziņš",
+  email: "janis.berzins@epasts.lv",
+  phone: "+371 20 123 456",
   avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&q=80",
   location: "Rīga, Latvija",
   joinDate: "2023-06",
@@ -81,8 +99,175 @@ const reviews = [
 ];
 
 const Profile = () => {
+  const { toast } = useToast();
+  const [userData, setUserData] = useState(initialUserData);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: userData.name,
+    email: userData.email,
+    phone: userData.phone,
+    location: userData.location,
+  });
+  const [settings, setSettings] = useState({
+    emailNotifications: true,
+    pushNotifications: false,
+    showEmail: false,
+    showPhone: true,
+  });
+
+  const handleEditSave = () => {
+    setUserData({ ...userData, ...editForm });
+    setIsEditOpen(false);
+    toast({
+      title: "Profils atjaunināts!",
+      description: "Jūsu profila informācija ir veiksmīgi saglabāta.",
+    });
+  };
+
+  const handleSettingsSave = () => {
+    setIsSettingsOpen(false);
+    toast({
+      title: "Iestatījumi saglabāti!",
+      description: "Jūsu iestatījumi ir veiksmīgi atjaunināti.",
+    });
+  };
+
   return (
     <Layout>
+      {/* Edit Profile Dialog */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Rediģēt profilu</DialogTitle>
+            <DialogDescription>
+              Atjauniniet savu profila informāciju
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Vārds</Label>
+              <Input
+                id="name"
+                value={editForm.name}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">E-pasts</Label>
+              <Input
+                id="email"
+                type="email"
+                value={editForm.email}
+                onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Tālrunis</Label>
+              <Input
+                id="phone"
+                value={editForm.phone}
+                onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="location">Atrašanās vieta</Label>
+              <Input
+                id="location"
+                value={editForm.location}
+                onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+              Atcelt
+            </Button>
+            <Button onClick={handleEditSave}>Saglabāt</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Settings Dialog */}
+      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Iestatījumi</DialogTitle>
+            <DialogDescription>
+              Pārvaldiet savus konta iestatījumus
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="space-y-4">
+              <h4 className="flex items-center gap-2 font-medium text-foreground">
+                <Bell className="h-4 w-4" />
+                Paziņojumi
+              </h4>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="email-notif" className="font-normal">
+                  E-pasta paziņojumi
+                </Label>
+                <Switch
+                  id="email-notif"
+                  checked={settings.emailNotifications}
+                  onCheckedChange={(checked) =>
+                    setSettings({ ...settings, emailNotifications: checked })
+                  }
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="push-notif" className="font-normal">
+                  Push paziņojumi
+                </Label>
+                <Switch
+                  id="push-notif"
+                  checked={settings.pushNotifications}
+                  onCheckedChange={(checked) =>
+                    setSettings({ ...settings, pushNotifications: checked })
+                  }
+                />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h4 className="flex items-center gap-2 font-medium text-foreground">
+                <Eye className="h-4 w-4" />
+                Privātums
+              </h4>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="show-email" className="font-normal">
+                  Rādīt e-pastu profilā
+                </Label>
+                <Switch
+                  id="show-email"
+                  checked={settings.showEmail}
+                  onCheckedChange={(checked) =>
+                    setSettings({ ...settings, showEmail: checked })
+                  }
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="show-phone" className="font-normal">
+                  Rādīt tālruni profilā
+                </Label>
+                <Switch
+                  id="show-phone"
+                  checked={settings.showPhone}
+                  onCheckedChange={(checked) =>
+                    setSettings({ ...settings, showPhone: checked })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSettingsOpen(false)}>
+              Atcelt
+            </Button>
+            <Button onClick={handleSettingsSave}>Saglabāt</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="bg-muted/30 py-8 min-h-screen">
         <div className="container mx-auto px-4">
           {/* Profile Header */}
@@ -118,11 +303,21 @@ const Profile = () => {
                       </div>
                     </div>
                     <div className="flex gap-2 justify-center sm:justify-end">
-                      <Button variant="outline" size="sm" className="gap-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1"
+                        onClick={() => setIsEditOpen(true)}
+                      >
                         <Edit className="h-4 w-4" />
                         Rediģēt
                       </Button>
-                      <Button variant="ghost" size="sm" className="gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1"
+                        onClick={() => setIsSettingsOpen(true)}
+                      >
                         <Settings className="h-4 w-4" />
                       </Button>
                     </div>
