@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Search, Heart } from "lucide-react";
+import { Search } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -65,12 +65,9 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
-          <p className="text-sm text-muted-foreground">
-            © 2024 Atradums. Visas tiesības aizsargātas.
-          </p>
-          <p className="flex items-center gap-1 text-sm text-muted-foreground">
-            Veidots ar <Heart className="h-4 w-4 text-lost" /> Latvijā
+        <div className="mt-12 border-t border-border pt-8">
+          <p className="text-center text-sm text-muted-foreground">
+            © 2026 Atradums. Visas tiesības aizsargātas.
           </p>
         </div>
       </div>
