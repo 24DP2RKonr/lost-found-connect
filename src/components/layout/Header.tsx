@@ -1,13 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, User, MessageSquare, Plus, LogIn } from "lucide-react";
+import { Search, Menu, X, User, MessageSquare, Plus, LogIn, Shield } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
 
   const navLinks = [
     { path: "/listings", label: "Sludinājumi" },
@@ -40,6 +42,13 @@ const Header = () => {
         <div className="hidden items-center gap-3 md:flex">
           {user ? (
             <>
+              {isAdmin && (
+                <Link to="/admin">
+                  <Button variant="ghost" size="icon" title="Admin panelis">
+                    <Shield className="h-5 w-5" />
+                  </Button>
+                </Link>
+              )}
               <Link to="/messages">
                 <Button variant="ghost" size="icon" className="relative">
                   <MessageSquare className="h-5 w-5" />
