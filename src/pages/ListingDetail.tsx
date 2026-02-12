@@ -218,7 +218,7 @@ const ListingDetail = () => {
                     Kopīgot
                   </Button>
 
-                  {(isAdmin || (user && listing.userId === user.id)) && (
+                  {(isAdmin || (user && (listing.userId === user.id || !listing.userId))) && (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
