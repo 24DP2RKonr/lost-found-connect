@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import { listingsStore } from "@/stores/listingsStore";
 const CreateListing = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const initialType = searchParams.get("type") as "lost" | "found" | null;
 
   const [listingType, setListingType] = useState<"lost" | "found">(initialType || "lost");
@@ -51,6 +53,7 @@ const CreateListing = () => {
       date: formData.date,
       type: listingType,
       images: images,
+      userId: user?.id,
     });
 
     toast.success("Sludinājums veiksmīgi publicēts!");

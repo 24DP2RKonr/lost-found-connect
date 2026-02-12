@@ -13,6 +13,7 @@ export interface Listing {
   date: string;
   image: string;
   views: number;
+  userId?: string;
 }
 
 interface ListingCardProps {

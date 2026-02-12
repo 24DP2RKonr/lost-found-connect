@@ -30,11 +30,15 @@ import { toast } from "sonner";
 import { listingsStore, useListings } from "@/stores/listingsStore";
 import { messagesStore } from "@/stores/messagesStore";
 import { Listing } from "@/components/listings/ListingCard";
+import { useAuth } from "@/contexts/AuthContext";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const ListingDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const allListings = useListings();
+  const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const [listing, setListing] = useState<Listing | undefined>();
   const [message, setMessage] = useState("");
 
@@ -214,37 +218,39 @@ const ListingDetail = () => {
                     Kopīgot
                   </Button>
 
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Dzēst sludinājumu
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Vai tiešām vēlies dzēst?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Šī darbība ir neatgriezeniska. Sludinājums tiks
-                          neatgriezeniski izdzēsts.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Atcelt</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleDelete}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  {(isAdmin || (user && listing.userId === user.id)) && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
                         >
-                          Dzēst
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                          <Trash2 className="h-4 w-4" />
+                          Dzēst sludinājumu
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Vai tiešām vēlies dzēst?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Šī darbība ir neatgriezeniska. Sludinājums tiks
+                            neatgriezeniski izdzēsts.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Atcelt</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleDelete}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Dzēst
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                 </CardContent>
               </Card>
             </div>
