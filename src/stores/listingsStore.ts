@@ -146,6 +146,7 @@ export const listingsStore = {
     date: string;
     type: "lost" | "found";
     images: string[];
+    userId?: string;
   }): Listing => {
     const newListing: Listing = {
       id: Date.now().toString(),
@@ -157,6 +158,7 @@ export const listingsStore = {
       date: data.date || new Date().toISOString().split("T")[0],
       image: data.images[0] || "https://images.unsplash.com/photo-1586769852044-692d6e3703f0?w=400&q=80",
       views: 0,
+      userId: data.userId,
     };
 
     listings = [newListing, ...listings];
