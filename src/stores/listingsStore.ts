@@ -12,6 +12,7 @@ const initialListings: Listing[] = [
     date: "2024-01-28",
     image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80",
     views: 245,
+    userId: "b3cc5564-d26d-454d-a398-2f57f1ba7024",
   },
   {
     id: "2",
@@ -23,6 +24,7 @@ const initialListings: Listing[] = [
     date: "2024-01-28",
     image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=400&q=80",
     views: 189,
+    userId: "b3cc5564-d26d-454d-a398-2f57f1ba7024",
   },
   {
     id: "3",
@@ -34,6 +36,7 @@ const initialListings: Listing[] = [
     date: "2024-01-27",
     image: "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&q=80",
     views: 567,
+    userId: "b3cc5564-d26d-454d-a398-2f57f1ba7024",
   },
   {
     id: "4",
@@ -45,6 +48,7 @@ const initialListings: Listing[] = [
     date: "2024-01-27",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
     views: 98,
+    userId: "b3cc5564-d26d-454d-a398-2f57f1ba7024",
   },
   {
     id: "5",
@@ -56,6 +60,7 @@ const initialListings: Listing[] = [
     date: "2024-01-26",
     image: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400&q=80",
     views: 156,
+    userId: "b3cc5564-d26d-454d-a398-2f57f1ba7024",
   },
   {
     id: "6",
@@ -67,6 +72,7 @@ const initialListings: Listing[] = [
     date: "2024-01-26",
     image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80",
     views: 234,
+    userId: "b3cc5564-d26d-454d-a398-2f57f1ba7024",
   },
   {
     id: "7",
@@ -78,6 +84,7 @@ const initialListings: Listing[] = [
     date: "2024-01-25",
     image: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80",
     views: 892,
+    userId: "b3cc5564-d26d-454d-a398-2f57f1ba7024",
   },
   {
     id: "8",
@@ -89,6 +96,7 @@ const initialListings: Listing[] = [
     date: "2024-01-25",
     image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80",
     views: 67,
+    userId: "b3cc5564-d26d-454d-a398-2f57f1ba7024",
   },
 ];
 
