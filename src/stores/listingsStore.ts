@@ -119,7 +119,16 @@ function loadListings(): Listing[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      return JSON.parse(stored);
+      const parsed: Listing[] = JSON.parse(stored);
+      // If any initial listing is missing userId, reset to fresh data
+      const hasStaleData = parsed.some(
+        (l) => initialListings.find((il) => il.id === l.id) && !l.userId
+      );
+      if (hasStaleData) {
+        saveListings(initialListings);
+        return initialListings;
+      }
+      return parsed;
     }
   } catch (e) {
     console.error("Failed to load listings from localStorage", e);
