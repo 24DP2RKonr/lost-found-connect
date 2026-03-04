@@ -165,6 +165,13 @@ const Messages = () => {
                               : "bg-muted text-foreground"
                           }`}
                         >
+                          <p
+                            className={`text-xs font-semibold mb-1 ${
+                              msg.isOwn ? "text-primary-foreground/80" : "text-foreground/70"
+                            }`}
+                          >
+                            {msg.isOwn ? (msg.senderName || "Es") : selectedConversation.userName}
+                          </p>
                           <p className="text-sm">{msg.text}</p>
                           <p
                             className={`text-xs mt-1 ${
