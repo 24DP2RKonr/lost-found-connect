@@ -95,6 +95,7 @@ const ListingDetail = () => {
       listingId: id,
       listingTitle: listing.title,
       messageText: message.trim(),
+      authorName: authorProfile?.name || "Lietotājs",
     });
     
     toast.success("Ziņojums nosūtīts! Atver 'Ziņojumi' lai redzētu sarunu.");
