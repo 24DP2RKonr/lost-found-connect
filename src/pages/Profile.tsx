@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useListings } from "@/stores/listingsStore";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +34,7 @@ import {
 } from "lucide-react";
 import ListingCard, { Listing } from "@/components/listings/ListingCard";
 
-const userListings: Listing[] = [];
+
 
 const reviews = [
   {
@@ -51,7 +52,11 @@ const Profile = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
+  const allListings = useListings();
+  const userListings = allListings.filter((l) => l.userId === user?.id);
+
   const [profile, setProfile] = useState({ name: "", phone: "", location: "", avatar_url: "" });
+
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editForm, setEditForm] = useState({ name: "", phone: "", location: "" });
