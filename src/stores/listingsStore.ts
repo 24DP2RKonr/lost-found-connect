@@ -113,7 +113,7 @@ const categoryMap: Record<string, string> = {
 };
 
 // Simple in-memory store with localStorage persistence
-const STORAGE_KEY = "atradi_listings";
+const STORAGE_KEY = "atradi_listings_v2";
 
 function loadListings(): Listing[] {
   try {
