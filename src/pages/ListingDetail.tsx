@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +26,7 @@ import {
   Share2,
   Trash2,
   Send,
+  User,
 } from "lucide-react";
 import { toast } from "sonner";
 import { listingsStore, useListings } from "@/stores/listingsStore";
@@ -32,6 +34,7 @@ import { messagesStore } from "@/stores/messagesStore";
 import { Listing } from "@/components/listings/ListingCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/useAdmin";
+import { supabase } from "@/integrations/supabase/client";
 
 const ListingDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,16 +44,38 @@ const ListingDetail = () => {
   const { isAdmin } = useAdmin();
   const [listing, setListing] = useState<Listing | undefined>();
   const [message, setMessage] = useState("");
+  const [authorProfile, setAuthorProfile] = useState<{ name: string; avatar_url: string | null; location: string | null } | null>(null);
+  const [viewCounted, setViewCounted] = useState(false);
 
+  // Load listing
   useEffect(() => {
     if (id) {
       const found = listingsStore.getListing(id);
       setListing(found);
-      if (found) {
-        listingsStore.incrementViews(id);
-      }
     }
   }, [id, allListings]);
+
+  // Increment views only once per page visit
+  useEffect(() => {
+    if (id && listing && !viewCounted) {
+      listingsStore.incrementViews(id);
+      setViewCounted(true);
+    }
+  }, [id, listing, viewCounted]);
+
+  // Fetch author profile
+  useEffect(() => {
+    if (listing?.userId) {
+      supabase
+        .from("profiles")
+        .select("name, avatar_url, location")
+        .eq("user_id", listing.userId)
+        .single()
+        .then(({ data }) => {
+          if (data) setAuthorProfile(data);
+        });
+    }
+  }, [listing?.userId]);
 
   const handleDelete = () => {
     if (id) {
@@ -181,6 +206,34 @@ const ListingDetail = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
+              {/* Author Card */}
+              {authorProfile && (
+                <Card className="shadow-card">
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                      <User className="h-5 w-5 text-primary" />
+                      Publicēja
+                    </h3>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={authorProfile.avatar_url || undefined} alt={authorProfile.name} />
+                        <AvatarFallback>
+                          {authorProfile.name ? authorProfile.name.split(" ").map((n) => n[0]).join("") : "?"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold text-foreground">{authorProfile.name || "Lietotājs"}</p>
+                        {authorProfile.location && (
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />{authorProfile.location}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Contact Card */}
               <Card className="shadow-card">
                 <CardContent className="p-6">
