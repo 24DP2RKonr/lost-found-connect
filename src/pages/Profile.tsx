@@ -33,19 +33,7 @@ import {
 } from "lucide-react";
 import ListingCard, { Listing } from "@/components/listings/ListingCard";
 
-const userListings: Listing[] = [
-  {
-    id: "1",
-    title: "Melns iPhone 15 Pro ar sarkanu maciņu",
-    description: "Pazaudēju telefonu Vecrīgā, pie Doma laukuma.",
-    type: "lost",
-    category: "Elektronika",
-    location: "Rīga, Vecrīga",
-    date: "2024-01-28",
-    image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80",
-    views: 245,
-  },
-];
+const userListings: Listing[] = [];
 
 const reviews = [
   {
