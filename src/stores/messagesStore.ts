@@ -275,6 +275,7 @@ function setupRealtime() {
                 messages: [...c.messages, newMsg],
                 lastMessage: msg.text,
                 timestamp: newMsg.timestamp,
+                unread: c.unread + 1,
               };
             }
             return c;
