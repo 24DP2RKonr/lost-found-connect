@@ -156,7 +156,7 @@ const Messages = () => {
                     {selectedConversation.messages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}
+                        className={`flex ${msg.isOwn ? "justify-start" : "justify-end"}`}
                       >
                         <div
                           className={`max-w-[70%] rounded-2xl px-4 py-2 ${
