@@ -77,9 +77,9 @@ const ListingDetail = () => {
     }
   }, [listing?.userId]);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (id) {
-      listingsStore.deleteListing(id);
+      await listingsStore.deleteListing(id);
       toast.success("Sludinājums izdzēsts!");
       navigate("/listings");
     }
