@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Search, Menu, X, User, MessageSquare, Plus, LogIn, Shield } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useConversations, messagesStore } from "@/stores/messagesStore";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
