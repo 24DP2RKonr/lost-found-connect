@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Send, ArrowLeft } from "lucide-react";
 import { useConversations, messagesStore, Conversation } from "@/stores/messagesStore";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Messages = () => {
   const allConversations = useConversations();
