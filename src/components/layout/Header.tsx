@@ -11,6 +11,16 @@ const Header = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
+  const conversations = useConversations();
+
+  // Load conversations when user changes
+  useEffect(() => {
+    if (user) {
+      messagesStore.loadForUser(user.id);
+    }
+  }, [user]);
+
+  const unreadCount = conversations.reduce((sum, c) => sum + c.unread, 0);
 
   const navLinks = [
     { path: "/listings", label: "Sludinājumi" },
