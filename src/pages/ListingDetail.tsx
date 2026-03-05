@@ -31,7 +31,7 @@ import {
 import { toast } from "sonner";
 import { listingsStore, useListings } from "@/stores/listingsStore";
 import { messagesStore } from "@/stores/messagesStore";
-import { Listing } from "@/components/listings/ListingCard";
+import { Listing } from "@/stores/listingsStore";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,25 +77,30 @@ const ListingDetail = () => {
     }
   }, [listing?.userId]);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (id) {
-      listingsStore.deleteListing(id);
+      await listingsStore.deleteListing(id);
       toast.success("Sludinājums izdzēsts!");
       navigate("/listings");
     }
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!message.trim() || !listing || !id) {
       toast.error("Lūdzu uzraksti ziņojumu");
       return;
     }
+    if (!listing.userId) {
+      toast.error("Nevar noteikt sludinājuma autoru");
+      return;
+    }
     
-    messagesStore.startConversation({
+    await messagesStore.startConversation({
       listingId: id,
       listingTitle: listing.title,
       messageText: message.trim(),
       authorName: authorProfile?.name || "Lietotājs",
+      receiverId: listing.userId,
     });
     
     toast.success("Ziņojums nosūtīts! Atver 'Ziņojumi' lai redzētu sarunu.");

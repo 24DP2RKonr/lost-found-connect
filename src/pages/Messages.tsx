@@ -6,13 +6,22 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Send, ArrowLeft } from "lucide-react";
 import { useConversations, messagesStore, Conversation } from "@/stores/messagesStore";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Messages = () => {
+  const { user } = useAuth();
   const allConversations = useConversations();
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load conversations for current user
+  useEffect(() => {
+    if (user) {
+      messagesStore.loadForUser(user.id);
+    }
+  }, [user]);
 
   // Update selected conversation when store changes
   useEffect(() => {
@@ -35,10 +44,10 @@ const Messages = () => {
       conv.listingTitle.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation) return;
     
-    messagesStore.addMessage(selectedConversation.id, newMessage.trim());
+    await messagesStore.addMessage(selectedConversation.id, newMessage.trim());
     setNewMessage("");
   };
 
