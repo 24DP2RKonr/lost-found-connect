@@ -35,17 +35,20 @@ const CreateListing = () => {
   });
   const [images, setImages] = useState<string[]>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
     if (!formData.title || !formData.description || !formData.category || !formData.location) {
       toast.error("Lūdzu aizpildiet visus obligātos laukus");
       return;
     }
 
-    // Add listing to store
-    listingsStore.addListing({
+    if (!user) {
+      toast.error("Lūdzu piesakieties, lai publicētu sludinājumu");
+      return;
+    }
+
+    const result = await listingsStore.addListing({
       title: formData.title,
       description: formData.description,
       category: formData.category,
@@ -53,11 +56,15 @@ const CreateListing = () => {
       date: formData.date,
       type: listingType,
       images: images,
-      userId: user?.id,
+      userId: user.id,
     });
 
-    toast.success("Sludinājums veiksmīgi publicēts!");
-    navigate("/listings");
+    if (result) {
+      toast.success("Sludinājums veiksmīgi publicēts!");
+      navigate("/listings");
+    } else {
+      toast.error("Kļūda publicējot sludinājumu");
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

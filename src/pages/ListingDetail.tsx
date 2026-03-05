@@ -85,17 +85,22 @@ const ListingDetail = () => {
     }
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!message.trim() || !listing || !id) {
       toast.error("Lūdzu uzraksti ziņojumu");
       return;
     }
+    if (!listing.userId) {
+      toast.error("Nevar noteikt sludinājuma autoru");
+      return;
+    }
     
-    messagesStore.startConversation({
+    await messagesStore.startConversation({
       listingId: id,
       listingTitle: listing.title,
       messageText: message.trim(),
       authorName: authorProfile?.name || "Lietotājs",
+      receiverId: listing.userId,
     });
     
     toast.success("Ziņojums nosūtīts! Atver 'Ziņojumi' lai redzētu sarunu.");

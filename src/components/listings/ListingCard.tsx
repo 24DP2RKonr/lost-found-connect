@@ -2,19 +2,9 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, MessageSquare, Eye } from "lucide-react";
+import { Listing } from "@/stores/listingsStore";
 
-export interface Listing {
-  id: string;
-  title: string;
-  description: string;
-  type: "lost" | "found";
-  category: string;
-  location: string;
-  date: string;
-  image: string;
-  views: number;
-  userId?: string;
-}
+export type { Listing };
 
 interface ListingCardProps {
   listing: Listing;
