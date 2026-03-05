@@ -1,7 +1,19 @@
-import { Listing } from "@/components/listings/ListingCard";
+import * as React from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-// Initial mock data
-const initialListings: Listing[] = [];
+export interface Listing {
+  id: string;
+  title: string;
+  description: string;
+  type: "lost" | "found";
+  category: string;
+  location: string;
+  date: string;
+  image: string;
+  views: number;
+  userId?: string;
+  created_at?: string;
+}
 
 // Category mapping
 const categoryMap: Record<string, string> = {
@@ -15,41 +27,44 @@ const categoryMap: Record<string, string> = {
   other: "Cits",
 };
 
-// Simple in-memory store with localStorage persistence
-const STORAGE_KEY = "atradi_listings_v3";
-
-function loadListings(): Listing[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed: Listing[] = JSON.parse(stored);
-      // If any initial listing is missing userId, reset to fresh data
-      const hasStaleData = parsed.some(
-        (l) => initialListings.find((il) => il.id === l.id) && !l.userId
-      );
-      if (hasStaleData) {
-        saveListings(initialListings);
-        return initialListings;
-      }
-      return parsed;
-    }
-  } catch (e) {
-    console.error("Failed to load listings from localStorage", e);
-  }
-  return initialListings;
+function mapRow(row: any): Listing {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    type: row.type as "lost" | "found",
+    category: row.category,
+    location: row.location,
+    date: row.date,
+    image: row.image,
+    views: row.views,
+    userId: row.user_id,
+    created_at: row.created_at,
+  };
 }
 
-function saveListings(listings: Listing[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(listings));
-  } catch (e) {
-    console.error("Failed to save listings to localStorage", e);
-  }
-}
-
-// Store state
-let listings: Listing[] = loadListings();
+let listings: Listing[] = [];
 let listeners: (() => void)[] = [];
+let loaded = false;
+
+function notifyListeners() {
+  listeners.forEach((l) => l());
+}
+
+async function loadFromDb() {
+  const { data, error } = await supabase
+    .from("listings")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (!error && data) {
+    listings = data.map(mapRow);
+    loaded = true;
+    notifyListeners();
+  }
+}
+
+// Initial load
+loadFromDb();
 
 export const listingsStore = {
   getListings: (): Listing[] => listings,
@@ -58,7 +73,9 @@ export const listingsStore = {
     return listings.find((l) => l.id === id);
   },
 
-  addListing: (data: {
+  reload: loadFromDb,
+
+  addListing: async (data: {
     title: string;
     description: string;
     category: string;
@@ -67,9 +84,8 @@ export const listingsStore = {
     type: "lost" | "found";
     images: string[];
     userId?: string;
-  }): Listing => {
-    const newListing: Listing = {
-      id: Date.now().toString(),
+  }): Promise<Listing | null> => {
+    const row = {
       title: data.title,
       description: data.description,
       type: data.type,
@@ -78,27 +94,42 @@ export const listingsStore = {
       date: data.date || new Date().toISOString().split("T")[0],
       image: data.images[0] || "https://images.unsplash.com/photo-1586769852044-692d6e3703f0?w=400&q=80",
       views: 0,
-      userId: data.userId,
+      user_id: data.userId!,
     };
 
+    const { data: inserted, error } = await supabase
+      .from("listings")
+      .insert(row)
+      .select()
+      .single();
+
+    if (error || !inserted) {
+      console.error("Failed to insert listing", error);
+      return null;
+    }
+
+    const newListing = mapRow(inserted);
     listings = [newListing, ...listings];
-    saveListings(listings);
     notifyListeners();
     return newListing;
   },
 
-  deleteListing: (id: string): void => {
-    listings = listings.filter((l) => l.id !== id);
-    saveListings(listings);
-    notifyListeners();
+  deleteListing: async (id: string): Promise<void> => {
+    const { error } = await supabase.from("listings").delete().eq("id", id);
+    if (!error) {
+      listings = listings.filter((l) => l.id !== id);
+      notifyListeners();
+    }
   },
 
-  incrementViews: (id: string): void => {
-    listings = listings.map((l) =>
-      l.id === id ? { ...l, views: l.views + 1 } : l
-    );
-    saveListings(listings);
+  incrementViews: async (id: string): Promise<void> => {
+    const listing = listings.find((l) => l.id === id);
+    if (!listing) return;
+    const newViews = listing.views + 1;
+    // Optimistic update
+    listings = listings.map((l) => (l.id === id ? { ...l, views: newViews } : l));
     notifyListeners();
+    await supabase.from("listings").update({ views: newViews }).eq("id", id);
   },
 
   subscribe: (listener: () => void): (() => void) => {
@@ -109,19 +140,13 @@ export const listingsStore = {
   },
 };
 
-function notifyListeners() {
-  listeners.forEach((listener) => listener());
-}
-
-// Hook for React components
 export function useListings(): Listing[] {
   const [, forceUpdate] = React.useState({});
 
   React.useEffect(() => {
+    if (!loaded) loadFromDb();
     return listingsStore.subscribe(() => forceUpdate({}));
   }, []);
 
   return listingsStore.getListings();
 }
-
-import * as React from "react";
