@@ -44,10 +44,10 @@ const Messages = () => {
       conv.listingTitle.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation) return;
     
-    messagesStore.addMessage(selectedConversation.id, newMessage.trim());
+    await messagesStore.addMessage(selectedConversation.id, newMessage.trim());
     setNewMessage("");
   };
 
