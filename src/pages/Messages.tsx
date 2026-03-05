@@ -9,11 +9,19 @@ import { useConversations, messagesStore, Conversation } from "@/stores/messages
 import { useAuth } from "@/contexts/AuthContext";
 
 const Messages = () => {
+  const { user } = useAuth();
   const allConversations = useConversations();
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load conversations for current user
+  useEffect(() => {
+    if (user) {
+      messagesStore.loadForUser(user.id);
+    }
+  }, [user]);
 
   // Update selected conversation when store changes
   useEffect(() => {
