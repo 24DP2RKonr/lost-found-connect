@@ -63,7 +63,9 @@ const Header = () => {
               <Link to="/messages">
                 <Button variant="ghost" size="icon" className="relative">
                   <MessageSquare className="h-5 w-5" />
-                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">3</span>
+                  {unreadCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">{unreadCount}</span>
+                  )}
                 </Button>
               </Link>
               <Link to="/profile">
