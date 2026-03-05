@@ -101,7 +101,9 @@ const Header = () => {
                 <Link to="/messages" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start gap-2">
                     <MessageSquare className="h-4 w-4" />Ziņojumi
-                    <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">3</span>
+                    {unreadCount > 0 && (
+                      <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">{unreadCount}</span>
+                    )}
                   </Button>
                 </Link>
                 <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
