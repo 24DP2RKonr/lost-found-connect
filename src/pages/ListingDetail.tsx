@@ -31,7 +31,7 @@ import {
 import { toast } from "sonner";
 import { listingsStore, useListings } from "@/stores/listingsStore";
 import { messagesStore } from "@/stores/messagesStore";
-import { Listing } from "@/components/listings/ListingCard";
+import { Listing } from "@/stores/listingsStore";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
