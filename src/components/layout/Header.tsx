@@ -1,15 +1,26 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Search, Menu, X, User, MessageSquare, Plus, LogIn, Shield } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useConversations, messagesStore } from "@/stores/messagesStore";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
+  const conversations = useConversations();
+
+  // Load conversations when user changes
+  useEffect(() => {
+    if (user) {
+      messagesStore.loadForUser(user.id);
+    }
+  }, [user]);
+
+  const unreadCount = conversations.reduce((sum, c) => sum + c.unread, 0);
 
   const navLinks = [
     { path: "/listings", label: "Sludinājumi" },
@@ -52,7 +63,9 @@ const Header = () => {
               <Link to="/messages">
                 <Button variant="ghost" size="icon" className="relative">
                   <MessageSquare className="h-5 w-5" />
-                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">3</span>
+                  {unreadCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">{unreadCount}</span>
+                  )}
                 </Button>
               </Link>
               <Link to="/profile">
@@ -88,7 +101,9 @@ const Header = () => {
                 <Link to="/messages" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start gap-2">
                     <MessageSquare className="h-4 w-4" />Ziņojumi
-                    <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">3</span>
+                    {unreadCount > 0 && (
+                      <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">{unreadCount}</span>
+                    )}
                   </Button>
                 </Link>
                 <Link to="/profile" onClick={() => setIsMenuOpen(false)}>

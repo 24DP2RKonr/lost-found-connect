@@ -238,6 +238,16 @@ export const messagesStore = {
     notifyListeners();
   },
 
+  markAsRead: (conversationId: string): void => {
+    conversations = conversations.map((c) => {
+      if (c.id === conversationId) {
+        return { ...c, unread: 0 };
+      }
+      return c;
+    });
+    notifyListeners();
+  },
+
   subscribe: (listener: () => void): (() => void) => {
     listeners.push(listener);
     return () => {
@@ -275,6 +285,7 @@ function setupRealtime() {
                 messages: [...c.messages, newMsg],
                 lastMessage: msg.text,
                 timestamp: newMsg.timestamp,
+                unread: c.unread + 1,
               };
             }
             return c;

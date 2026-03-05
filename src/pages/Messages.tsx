@@ -82,7 +82,10 @@ const Messages = () => {
                   filteredConversations.map((conv) => (
                     <button
                       key={conv.id}
-                      onClick={() => setSelectedConversation(conv)}
+                      onClick={() => {
+                        setSelectedConversation(conv);
+                        messagesStore.markAsRead(conv.id);
+                      }}
                       className={`w-full border-b border-border p-4 text-left transition-colors hover:bg-muted/50 ${
                         selectedConversation?.id === conv.id ? "bg-muted" : ""
                       }`}
