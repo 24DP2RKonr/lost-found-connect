@@ -16,23 +16,42 @@ import { Search, Grid, List, MapPin, X } from "lucide-react";
 import { useListings } from "@/stores/listingsStore";
 
 const Listings = () => {
+  const [searchParams] = useSearchParams();
   const allListings = useListings();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("category") || "all");
+  const [locationFilter, setLocationFilter] = useState(searchParams.get("location") || "");
+  const [sortBy, setSortBy] = useState<string>("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const filteredListings = allListings.filter((listing) => {
-    const matchesSearch =
-      listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      listing.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = typeFilter === "all" || listing.type === typeFilter;
-    const matchesCategory =
-      categoryFilter === "all" || listing.category === categoryFilter;
-    return matchesSearch && matchesType && matchesCategory;
-  });
+  const locations = useMemo(() => [...new Set(allListings.map((l) => l.location).filter(Boolean))], [allListings]);
+  const categories = useMemo(() => [...new Set(allListings.map((l) => l.category))], [allListings]);
 
-  const categories = [...new Set(allListings.map((l) => l.category))];
+  const filteredListings = useMemo(() => {
+    let result = allListings.filter((listing) => {
+      const matchesSearch =
+        listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        listing.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesType = typeFilter === "all" || listing.type === typeFilter;
+      const matchesCategory =
+        categoryFilter === "all" || listing.category === categoryFilter;
+      const matchesLocation =
+        !locationFilter || listing.location.toLowerCase().includes(locationFilter.toLowerCase());
+      return matchesSearch && matchesType && matchesCategory && matchesLocation;
+    });
+
+    // Sort
+    if (sortBy === "newest") {
+      result.sort((a, b) => (b.created_at || b.date).localeCompare(a.created_at || a.date));
+    } else if (sortBy === "oldest") {
+      result.sort((a, b) => (a.created_at || a.date).localeCompare(b.created_at || b.date));
+    } else if (sortBy === "views") {
+      result.sort((a, b) => b.views - a.views);
+    }
+
+    return result;
+  }, [allListings, searchQuery, typeFilter, categoryFilter, locationFilter, sortBy]);
 
   return (
     <Layout>
