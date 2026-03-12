@@ -246,7 +246,17 @@ export const messagesStore = {
     notifyListeners();
   },
 
-  markAsRead: (conversationId: string): void => {
+  markAsRead: async (conversationId: string): Promise<void> => {
+    if (!currentUserId) return;
+
+    // Mark all unread messages in this conversation as read in DB
+    await supabase
+      .from("messages")
+      .update({ read: true })
+      .eq("conversation_id", conversationId)
+      .neq("sender_id", currentUserId)
+      .eq("read", false);
+
     conversations = conversations.map((c) => {
       if (c.id === conversationId) {
         return { ...c, unread: 0 };
