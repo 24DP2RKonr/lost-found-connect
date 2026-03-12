@@ -61,6 +61,14 @@ async function loadConversations(userId: string) {
     allMessages = msgs || [];
   }
 
+  // Count unread messages per conversation (messages not sent by me and not read)
+  const unreadMap: Record<string, number> = {};
+  allMessages.forEach((m: any) => {
+    if (m.sender_id !== userId && !m.read) {
+      unreadMap[m.conversation_id] = (unreadMap[m.conversation_id] || 0) + 1;
+    }
+  });
+
   // Fetch profile names for other users
   const otherUserIds = convRows.map((c: any) =>
     c.sender_id === userId ? c.receiver_id : c.sender_id
