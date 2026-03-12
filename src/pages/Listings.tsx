@@ -121,6 +121,37 @@ const Listings = () => {
                 </SelectContent>
               </Select>
 
+              {/* Location Filter */}
+              <div className="relative w-full lg:w-[200px]">
+                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Filtrēt pēc vietas..."
+                  value={locationFilter}
+                  onChange={(e) => setLocationFilter(e.target.value)}
+                  className="pl-9 pr-8"
+                />
+                {locationFilter && (
+                  <button
+                    onClick={() => setLocationFilter("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Sort */}
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-full lg:w-[160px]">
+                  <SelectValue placeholder="Kārtot" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Jaunākie</SelectItem>
+                  <SelectItem value="oldest">Vecākie</SelectItem>
+                  <SelectItem value="views">Populārākie</SelectItem>
+                </SelectContent>
+              </Select>
+
               {/* View Mode */}
               <div className="flex gap-1 border border-border rounded-lg p-1">
                 <Button
@@ -143,12 +174,12 @@ const Listings = () => {
             </div>
           </div>
 
-          {/* Results count */}
-          <div className="mb-6 flex items-center justify-between">
+          {/* Results count & active filters */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm text-muted-foreground">
               Atrasti <span className="font-semibold text-foreground">{filteredListings.length}</span> sludinājumi
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {typeFilter !== "all" && (
                 <Badge variant="secondary" className="gap-1">
                   {typeFilter === "lost" ? "Pazudušas" : "Atrastas"}
@@ -165,6 +196,17 @@ const Listings = () => {
                   {categoryFilter}
                   <button
                     onClick={() => setCategoryFilter("all")}
+                    className="ml-1 hover:text-destructive"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              )}
+              {locationFilter && (
+                <Badge variant="secondary" className="gap-1">
+                  📍 {locationFilter}
+                  <button
+                    onClick={() => setLocationFilter("")}
                     className="ml-1 hover:text-destructive"
                   >
                     ×
