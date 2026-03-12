@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ListingCard from "@/components/listings/ListingCard";
 import { Button } from "@/components/ui/button";
@@ -11,27 +12,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Grid, List } from "lucide-react";
+import { Search, Grid, List, MapPin, X } from "lucide-react";
 import { useListings } from "@/stores/listingsStore";
 
 const Listings = () => {
+  const [searchParams] = useSearchParams();
   const allListings = useListings();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("category") || "all");
+  const [locationFilter, setLocationFilter] = useState(searchParams.get("location") || "");
+  const [sortBy, setSortBy] = useState<string>("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const filteredListings = allListings.filter((listing) => {
-    const matchesSearch =
-      listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      listing.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = typeFilter === "all" || listing.type === typeFilter;
-    const matchesCategory =
-      categoryFilter === "all" || listing.category === categoryFilter;
-    return matchesSearch && matchesType && matchesCategory;
-  });
+  const locations = useMemo(() => [...new Set(allListings.map((l) => l.location).filter(Boolean))], [allListings]);
+  const categories = useMemo(() => [...new Set(allListings.map((l) => l.category))], [allListings]);
 
-  const categories = [...new Set(allListings.map((l) => l.category))];
+  const filteredListings = useMemo(() => {
+    let result = allListings.filter((listing) => {
+      const matchesSearch =
+        listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        listing.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesType = typeFilter === "all" || listing.type === typeFilter;
+      const matchesCategory =
+        categoryFilter === "all" || listing.category === categoryFilter;
+      const matchesLocation =
+        !locationFilter || listing.location.toLowerCase().includes(locationFilter.toLowerCase());
+      return matchesSearch && matchesType && matchesCategory && matchesLocation;
+    });
+
+    // Sort
+    if (sortBy === "newest") {
+      result.sort((a, b) => (b.created_at || b.date).localeCompare(a.created_at || a.date));
+    } else if (sortBy === "oldest") {
+      result.sort((a, b) => (a.created_at || a.date).localeCompare(b.created_at || b.date));
+    } else if (sortBy === "views") {
+      result.sort((a, b) => b.views - a.views);
+    }
+
+    return result;
+  }, [allListings, searchQuery, typeFilter, categoryFilter, locationFilter, sortBy]);
 
   return (
     <Layout>
@@ -101,6 +121,37 @@ const Listings = () => {
                 </SelectContent>
               </Select>
 
+              {/* Location Filter */}
+              <div className="relative w-full lg:w-[200px]">
+                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Filtrēt pēc vietas..."
+                  value={locationFilter}
+                  onChange={(e) => setLocationFilter(e.target.value)}
+                  className="pl-9 pr-8"
+                />
+                {locationFilter && (
+                  <button
+                    onClick={() => setLocationFilter("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Sort */}
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-full lg:w-[160px]">
+                  <SelectValue placeholder="Kārtot" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Jaunākie</SelectItem>
+                  <SelectItem value="oldest">Vecākie</SelectItem>
+                  <SelectItem value="views">Populārākie</SelectItem>
+                </SelectContent>
+              </Select>
+
               {/* View Mode */}
               <div className="flex gap-1 border border-border rounded-lg p-1">
                 <Button
@@ -123,12 +174,12 @@ const Listings = () => {
             </div>
           </div>
 
-          {/* Results count */}
-          <div className="mb-6 flex items-center justify-between">
+          {/* Results count & active filters */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm text-muted-foreground">
               Atrasti <span className="font-semibold text-foreground">{filteredListings.length}</span> sludinājumi
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {typeFilter !== "all" && (
                 <Badge variant="secondary" className="gap-1">
                   {typeFilter === "lost" ? "Pazudušas" : "Atrastas"}
@@ -145,6 +196,17 @@ const Listings = () => {
                   {categoryFilter}
                   <button
                     onClick={() => setCategoryFilter("all")}
+                    className="ml-1 hover:text-destructive"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              )}
+              {locationFilter && (
+                <Badge variant="secondary" className="gap-1">
+                  📍 {locationFilter}
+                  <button
+                    onClick={() => setLocationFilter("")}
                     className="ml-1 hover:text-destructive"
                   >
                     ×
