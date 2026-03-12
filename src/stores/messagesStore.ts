@@ -99,7 +99,7 @@ async function loadConversations(userId: string) {
       userAvatar: profile?.avatar_url || undefined,
       lastMessage: lastMsg?.text || "",
       timestamp: lastMsg ? formatTime(lastMsg.created_at) : formatTime(c.created_at),
-      unread: 0,
+      unread: unreadMap[c.id] || 0,
       listingId: c.listing_id || "",
       listingTitle: c.listing_title || "",
       otherUserId,
