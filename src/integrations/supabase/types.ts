@@ -99,6 +99,7 @@ export type Database = {
           conversation_id: string
           created_at: string
           id: string
+          read: boolean
           sender_id: string
           text: string
         }
@@ -106,6 +107,7 @@ export type Database = {
           conversation_id: string
           created_at?: string
           id?: string
+          read?: boolean
           sender_id: string
           text: string
         }
@@ -113,6 +115,7 @@ export type Database = {
           conversation_id?: string
           created_at?: string
           id?: string
+          read?: boolean
           sender_id?: string
           text?: string
         }

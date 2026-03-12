@@ -61,6 +61,14 @@ async function loadConversations(userId: string) {
     allMessages = msgs || [];
   }
 
+  // Count unread messages per conversation (messages not sent by me and not read)
+  const unreadMap: Record<string, number> = {};
+  allMessages.forEach((m: any) => {
+    if (m.sender_id !== userId && !m.read) {
+      unreadMap[m.conversation_id] = (unreadMap[m.conversation_id] || 0) + 1;
+    }
+  });
+
   // Fetch profile names for other users
   const otherUserIds = convRows.map((c: any) =>
     c.sender_id === userId ? c.receiver_id : c.sender_id
@@ -91,7 +99,7 @@ async function loadConversations(userId: string) {
       userAvatar: profile?.avatar_url || undefined,
       lastMessage: lastMsg?.text || "",
       timestamp: lastMsg ? formatTime(lastMsg.created_at) : formatTime(c.created_at),
-      unread: 0,
+      unread: unreadMap[c.id] || 0,
       listingId: c.listing_id || "",
       listingTitle: c.listing_title || "",
       otherUserId,
@@ -238,7 +246,17 @@ export const messagesStore = {
     notifyListeners();
   },
 
-  markAsRead: (conversationId: string): void => {
+  markAsRead: async (conversationId: string): Promise<void> => {
+    if (!currentUserId) return;
+
+    // Mark all unread messages in this conversation as read in DB
+    await supabase
+      .from("messages")
+      .update({ read: true })
+      .eq("conversation_id", conversationId)
+      .neq("sender_id", currentUserId)
+      .eq("read", false);
+
     conversations = conversations.map((c) => {
       if (c.id === conversationId) {
         return { ...c, unread: 0 };
