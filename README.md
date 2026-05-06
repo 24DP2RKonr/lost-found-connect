@@ -11,10 +11,10 @@ TypeScript – drošākai un strukturētākai koda rakstīšanai.
 Vite – ātrai izstrādei un būvēšanai (build).
 
 ## Funkcijas
-[ ] Ziņojumu pievienošana: Lietotāji var pievienot ierakstus par pazaudētiem vai atrastiem priekšmetiem.
+Ziņojumu pievienošana: Lietotāji var pievienot ierakstus par pazaudētiem vai atrastiem priekšmetiem.
 
-[ ] Meklēšana un filtrēšana: Iespēja meklēt lietas pēc kategorijām vai atrašanās vietas.
+Meklēšana un filtrēšana: Iespēja meklēt lietas pēc kategorijām vai atrašanās vietas.
 
-[ ] Attēlu augšupielāde: Iespēja pievienot fotoattēlus, lai vieglāk identificētu mantas.
+Attēlu augšupielāde: Iespēja pievienot fotoattēlus, lai vieglāk identificētu mantas.
 
-[ ] Kontakti: Droša saziņa starp atradēju un īpašnieku.
+Kontakti: Droša saziņa starp atradēju un īpašnieku.
