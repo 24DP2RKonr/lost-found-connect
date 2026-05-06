@@ -10,7 +10,7 @@ TypeScript – drošākai un strukturētākai koda rakstīšanai.
 
 Vite – ātrai izstrādei un būvēšanai (build).
 
-## Funkcijas (Plānotās/Esošās)
+## Funkcijas
 [ ] Ziņojumu pievienošana: Lietotāji var pievienot ierakstus par pazaudētiem vai atrastiem priekšmetiem.
 
 [ ] Meklēšana un filtrēšana: Iespēja meklēt lietas pēc kategorijām vai atrašanās vietas.
